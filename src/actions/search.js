@@ -24,8 +24,7 @@ export const executeSearch = async (name, ingredients) => {
     },
     body: JSON.stringify({name, ingredients})
   })
-  const searchResults = await response.json()
-  return searchResults
+  return await response.json()
 }
 
 // TODO: fix action
