@@ -1,12 +1,11 @@
 // TODO Create a connected component to render a fetched recipe
 import { LinearProgress } from "@material-ui/core"
 import React from "react"
-import { useDispatch,useSelector } from "react-redux"
-import { useParams } from "react-router-dom"
+import { useSelector } from "react-redux"
 import { Ingredients } from "./ingredients"
 import { HeaderContainer, IngredientsWrapper, RecipeWrapper } from "./styles"
 
-export const Recipe = ({recipeId}) => {
+export const Recipe = () => {
   const recipe = useSelector(state => state.recipe)
   if(recipe.recipe){
     return(
@@ -27,5 +26,4 @@ export const Recipe = ({recipeId}) => {
   return(
     <LinearProgress/>
   )
-
 } 

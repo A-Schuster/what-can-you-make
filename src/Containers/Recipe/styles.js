@@ -1,5 +1,4 @@
 // TODO: Create styled component styles if needed
-import { repeat } from "lodash"
 import styled from "styled-components"
 
 export const RecipeWrapper = styled.div`
