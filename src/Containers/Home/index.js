@@ -9,12 +9,10 @@ import Divider from '@material-ui/core/Divider'
 import Button from '@material-ui/core/Button'
 import LinearProgress from '@material-ui/core/LinearProgress'
 import List from '@material-ui/core/List'
-import { Link } from 'react-router-dom'
+import { Link, withRouter, Route } from 'react-router-dom'
 import ListItemText from '@material-ui/core/ListItemText'
 import * as actions from '../../actions'
-import { Route, Switch } from "react-router-dom"
 import { Recipe } from '../Recipe'
-import { ListItem } from '@material-ui/core'
 
 const ingredientList = [
   "flour", "sugar", "salt", "butter", "milk"
@@ -29,6 +27,12 @@ class Home extends Component {
     this.state = {
       term: "",
       ingredients: ["milk"]
+    }
+  }
+  componentDidMount(){
+    const pathname = this.props.location?.pathname
+    if(pathname.length > 1){
+      this.props.selectRecipe(pathname.split('').slice(1).join(''))
     }
   }
   handleRecipe(recipeId){
@@ -57,48 +61,51 @@ class Home extends Component {
     const {recipes, isLoading,recipe} = this.props
     return (
       <HomeWrapper>
-        <Input
-          autoFocus={true}
-          fullWidth={true}
-          onChange={this.handleSearch}
-          value={term}
-        />
-        <div>
-          <h3>Ingredients on hand</h3>
-          {ingredientList.map(
-            ingredient => (
-              <FormControlLabel
-                key={ingredient}
-                control={
-                  <Checkbox
-                    checked={ingredients.includes(ingredient)}
-                    onChange={this.handleIngredient.bind(this, ingredient)}
-                    value={ingredient}
-                  />
-                }
-                label={ingredient}
-              />
+        <Route path={["/:id","/"]}>
+          <Input
+            placeholder="Search Terms"
+            autoFocus={true}
+            fullWidth={true}
+            onChange={this.handleSearch}
+            value={term}
+          />
+          <div>
+            <h3>Ingredients on hand</h3>
+            {ingredientList.map(
+              ingredient => (
+                <FormControlLabel
+                  key={ingredient}
+                  control={
+                    <Checkbox
+                      checked={ingredients.includes(ingredient)}
+                      onChange={this.handleIngredient.bind(this, ingredient)}
+                      value={ingredient}
+                    />
+                  }
+                  label={ingredient}
+                />
+              )
+            )}
+          </div>
+          <Button onClick={this.fetchSearch}>
+            search
+          </Button>
+          <Divider />
+          {
+            recipes && (
+              <List>
+                {recipes.map( recipe =>
+                  <Link to={`/${recipe.id}`} onClick={() => this.handleRecipe(recipe.id)} key={recipe.id}>
+                    <ListItemText primary={recipe.name} />
+                  </Link>
+                )}
+              </List>
             )
-          )}
-        </div>
-        <Button onClick={this.fetchSearch}>
-          search
-        </Button>
-        <Divider />
-        {
-          recipes && (
-            <List>
-              {recipes.map( recipe =>
-                <ListItem onClick={() => this.handleRecipe(recipe.id)} key={recipe.id}>
-                  <ListItemText primary={recipe.name} />
-                </ListItem>
-              )}
-            </List>
-          )
-        }
-        {isLoading && <LinearProgress />}
-        <Divider />
-        {recipe.recipe && <Recipe/>}
+          }
+          {isLoading || recipe.loading &&  <LinearProgress />}
+          <Divider />
+          {recipe.recipe && <Recipe />}
+        </Route>
       </HomeWrapper>
     )
   }
@@ -114,4 +121,4 @@ const mapDispatchToProps = dispatch => bindActionCreators({
   selectRecipe: actions.selectRecipe,
 }, dispatch)
 
-export default connect(mapStateToProps, mapDispatchToProps)(Home)
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Home))
