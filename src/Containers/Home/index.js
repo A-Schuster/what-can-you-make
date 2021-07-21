@@ -14,6 +14,7 @@ import ListItemText from '@material-ui/core/ListItemText'
 import * as actions from '../../actions'
 import { Route, Switch } from "react-router-dom"
 import { Recipe } from '../Recipe'
+import { ListItem } from '@material-ui/core'
 
 const ingredientList = [
   "flour", "sugar", "salt", "butter", "milk"
@@ -30,7 +31,9 @@ class Home extends Component {
       ingredients: ["milk"]
     }
   }
-
+  handleRecipe(recipeId){
+    this.props.selectRecipe(recipeId)
+  }
   fetchSearch() {
     const {term, ingredients} = this.state
     this.props.searchRecipes(term,ingredients)
@@ -51,69 +54,64 @@ class Home extends Component {
   }
   render () {
     const {term, ingredients} = this.state
-    const {recipes, isLoading} = this.props
+    const {recipes, isLoading,recipe} = this.props
     return (
       <HomeWrapper>
-        <Switch>
-          <Route exact path="/">
-            <Input
-              autoFocus={true}
-              fullWidth={true}
-              onChange={this.handleSearch}
-              value={term}
-            />
-            <div>
-              <h3>Ingredients on hand</h3>
-              {ingredientList.map(
-                ingredient => (
-                  <FormControlLabel
-                    key={ingredient}
-                    control={
-                      <Checkbox
-                        checked={ingredients.includes(ingredient)}
-                        onChange={this.handleIngredient.bind(this, ingredient)}
-                        value={ingredient}
-                      />
-                    }
-                    label={ingredient}
+        <Input
+          autoFocus={true}
+          fullWidth={true}
+          onChange={this.handleSearch}
+          value={term}
+        />
+        <div>
+          <h3>Ingredients on hand</h3>
+          {ingredientList.map(
+            ingredient => (
+              <FormControlLabel
+                key={ingredient}
+                control={
+                  <Checkbox
+                    checked={ingredients.includes(ingredient)}
+                    onChange={this.handleIngredient.bind(this, ingredient)}
+                    value={ingredient}
                   />
-                )
+                }
+                label={ingredient}
+              />
+            )
+          )}
+        </div>
+        <Button onClick={this.fetchSearch}>
+          search
+        </Button>
+        <Divider />
+        {
+          recipes && (
+            <List>
+              {recipes.map( recipe =>
+                <ListItem onClick={() => this.handleRecipe(recipe.id)} key={recipe.id}>
+                  <ListItemText primary={recipe.name} />
+                </ListItem>
               )}
-            </div>
-            <Button onClick={this.fetchSearch}>
-              search
-            </Button>
-            <Divider />
-            {
-              recipes && (
-                <List>
-                  {recipes.map( recipe =>
-                    <Link to={`recipe/${recipe.id}`} key={recipe.id}>
-                      <ListItemText primary={recipe.name} />
-                    </Link>
-                  )}
-                </List>
-              )
-            }
-          </Route>
-          {isLoading && <LinearProgress />}
-          <Divider />
-          <Route>
-            <Recipe path={`/recipe/:id`} />
-          </Route>
-        </Switch>
+            </List>
+          )
+        }
+        {isLoading && <LinearProgress />}
+        <Divider />
+        {recipe.recipe && <Recipe/>}
       </HomeWrapper>
     )
   }
 }
 
 const mapStateToProps = (state) => {
-  const { search } = state
-  return {...search}
+  const { search,recipe } = state
+  return {...search,recipe}
 }
 
 const mapDispatchToProps = dispatch => bindActionCreators({
   searchRecipes: actions.searchRecipes,
+  selectRecipe: actions.selectRecipe,
 }, dispatch)
 
 export default connect(mapStateToProps, mapDispatchToProps)(Home)

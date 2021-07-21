@@ -20,17 +20,17 @@ const failedRecipe = (payload) => ({
   payload
 })
 
-
-export const fetchRecipe = async (recipeId) => {
-  const response = fetch("/api/recipe/" + recipeId)
+export const fetchRecipe = async (id) => {
+  const response = await fetch(`/api/recipe/${id}`, {
+  })
   return await response.json()
 }
 
-export const searchRecipes = (name, ingredients) => {
+export const selectRecipe = (recipeId) => {
   return (dispatch) => {
     dispatch(loadingRecipe())
-    return fetchRecipe(name, ingredients).then(
-      res => dispatch(fetchRecipe(res))
+    fetchRecipe(recipeId).then(
+      res => dispatch(fetchedRecipe(res))
     ).catch(
       err => dispatch(failedRecipe(err))
     )
